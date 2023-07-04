@@ -1,20 +1,30 @@
-import Product from "../components/Product";
 import { useParams } from "react-router-dom";
 import React from 'react' 
-import products from "../products";
+// import products from "../products";
+import { useEffect, useState } from "react";
+import axios from "axios";
 import { Link } from "react-router-dom";
 import {Row, Col, Image, ListGroup, Card, Button, ListGroupItem} from "react-bootstrap"
 import Rating from "../components/Rating";
 
 const ProductScreen = () => {
-  //get the id from url when the image clicked
+  //get the product from the backend(server.js), particularly: app.get("/api/products/:id", (req, res)
+  const [product, setProduct] = useState({});
+
+  //get the id from url when the image clicked in Product.js
   const {id: productId} = useParams(); //productId: id in the url
 
-  //get the product
-  const product = products.find((p) => p._id === productId);
+  useEffect(() => {
+    const fetchProduct = async () => {
+      const {data} = await axios.get(`/api/products/${productId}`)
+      setProduct(data);
+    }
+    fetchProduct();
+  },[productId]) //when productId changes, run this (after the column it specifies dependency)
+
   return (
     <div>
-      <Link to="/" className="btn btn-light">Go Back</Link>
+      <Link to="/" className="btn btn-light" style={{ marginBottom: "15px" }}>Go Back</Link>
       <Row>
         <Col md={5}>
           <Image src={product.image} alt={product.name} fluid/>
@@ -70,7 +80,6 @@ const ProductScreen = () => {
                   Add to Cart
                 </Button> 
               </ListGroupItem>
-
             </ListGroup>
           </Card>
         </Col>
