@@ -8,7 +8,7 @@ import {Row, Col, Image, ListGroup, Card, Button, ListGroupItem} from "react-boo
 import Rating from "../components/Rating";
 
 const ProductScreen = () => {
-  //get the product from the backend(server.js), particularly: app.get("/api/products/:id", (req, res)
+  //get the product from the backend(server.js), particularly: app.get("/api/products/:id")
   const [product, setProduct] = useState({});
 
   //get the id from url when the image clicked in Product.js
