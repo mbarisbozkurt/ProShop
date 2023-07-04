@@ -11,7 +11,6 @@ const HomeScreen = () => {
 
   /*get the products from backend i.e server.js: app.get("/api/products", (req, res) => {
   res.json(products); })*/
-
   useEffect(() => {
    const fetchProducts = async () => {
       const {data} = await axios.get("/api/products"); 
