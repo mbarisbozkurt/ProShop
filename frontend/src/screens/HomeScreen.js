@@ -9,6 +9,10 @@ import Product from '../components/Product'
 const HomeScreen = () => {
   const [products, setProducts] = useState([]);
 
+  // useEffect(() => {
+  //   // side effect işlemleri
+  // }, [dependency]); //apply useEffect when dependency changed
+
   /*get the products from backend i.e server.js: app.get("/api/products", (req, res) => {
   res.json(products); })*/
   useEffect(() => {

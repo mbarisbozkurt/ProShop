@@ -13,7 +13,7 @@ const ProductScreen = () => {
 
   //get the id from url when the image clicked in Product.js
   const {id: productId} = useParams(); //productId: id in the url
-
+  
   useEffect(() => {
     const fetchProduct = async () => {
       const {data} = await axios.get(`/api/products/${productId}`)
