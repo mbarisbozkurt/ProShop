@@ -57,8 +57,8 @@ const destroyData = async() => {
   }
 }
 
-if(process.argv[2] === "-d"){
+if(process.argv[2] === "-d"){ //look at the package.json: "data:destroy": "node backend/seeder.js -d"
   destroyData();
-}else{
+}else{ //"node backend/seeder.js",
   importData();
 }
