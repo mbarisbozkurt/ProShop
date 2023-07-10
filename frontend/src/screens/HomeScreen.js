@@ -3,6 +3,8 @@ import {Row, Col} from "react-bootstrap"
 // import products from '../products'
 import Product from '../components/Product'
 import { useGetProductsQuery } from '../slices/productsApiSlice'
+import Loader from '../components/Loader'
+import Message from '../components/Message'
 
 const HomeScreen = () => {
   
@@ -10,7 +12,7 @@ const HomeScreen = () => {
   
   return (
    <>
-      {isLoading ? (<h2>Loading...</h2>) : error ? (<div>{error?.data?.HomeScreen.message || error.error}</div>) : (
+      {isLoading ? <Loader/> : error ? <Message variant="danger">{error?.data?.message || error.error}</Message> : (
          <>
             <h1>Latest Products</h1>
             <Row>
@@ -24,5 +26,7 @@ const HomeScreen = () => {
    </>
   )
 }
+
+//if projy error exists, run the server again
 
 export default HomeScreen

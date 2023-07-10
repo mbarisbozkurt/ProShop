@@ -6,11 +6,17 @@ export const productsApiSlice = apiSlice.injectEndpoints({ //add endpoints to ht
   endpoints: (builder) => ({
     getProducts: builder.query({ //for useGetProductsQuery in the export part
       query: () => ({
-        url: PRODUCTS_URL, //http://localhost:5000/api/products
+        url: PRODUCTS_URL, //get data from here: http://localhost:5000/api/products
+      }),
+      keepUnusedDataFor: 5,
+    }),
+    getProductDetails: builder.query({ //for useGetProductsQuery in the export part
+      query: (productId) => ({
+        url: `${PRODUCTS_URL}/${productId}` //get data from here: http://localhost:5000/api/products/id
       }),
       keepUnusedDataFor: 5,
     }),
   }),
 });
 
-export const {useGetProductsQuery} = productsApiSlice; //Convention: use....Query in this case: use Products Query
+export const {useGetProductsQuery, useGetProductDetailsQuery} = productsApiSlice; //Convention: use....Query in this case: use Products Query
