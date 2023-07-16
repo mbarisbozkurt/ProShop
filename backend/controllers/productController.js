@@ -9,13 +9,13 @@ const getProducts = asyncHandler(async(req, res) => {
   res.json(products);
 })
 
-//@desc: fetch a products
+//@desc: fetch a product
 //@route: GET /api/products/:id 
 //@access: public  
 const getProductById = asyncHandler(async(req, res) => {
   const product = await Product.findById(req.params.id);
 
-  if (product){
+  if(product){
     return res.json(product);
   }else{
     res.status(404);
