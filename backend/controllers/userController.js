@@ -6,7 +6,7 @@ import generateToken from "../utils/generateToken.js";
 //@route: POST /api/users/auth
 //@access: Public  
 const authUser = asyncHandler(async(req, res) => {
-  const {email, password} = req.body; //req is made from postman for now 
+  const {email, password} = req.body; 
 
   const user = await User.findOne({email}); //check if entered email is in the database
 
