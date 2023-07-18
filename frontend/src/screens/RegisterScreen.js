@@ -20,8 +20,8 @@ const RegisterScreen = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [register, {isLoading}] = useRegisterMutation(); //from backend: to be able to make a post request to the backend
-  const userInfo = useSelector((state) => state.auth.userInfo) //from frontend //state.name.initialState 
+  const [register, {isLoading}] = useRegisterMutation(); //from backend(apiSlice): to be able to make a post request to the backend
+  const userInfo = useSelector((state) => state.auth.userInfo) //from frontend(authSlice) //state.name.initialState 
 
   //redirect to /shipping or home page 
   const {search} = useLocation(); 
@@ -46,10 +46,13 @@ const RegisterScreen = () => {
         //get the response from the backend, use register() which comes from useRegisterMutation() and takes a parameter (updated with useState)
         //make a post request to: http://localhost:5000/api/users in the userController and get the response
         const res = await register({name, email, password}).unwrap();     
+        
         //update frontend
         dispatch(setCredentials({...res}));
+
         //navigate 
         navigate(redirect); //redirect'den sonra "/" olduğu için homepage'e yönlendir
+        
       } catch (error) {
         toast.error(error?.data?.message || error?.error);
       }

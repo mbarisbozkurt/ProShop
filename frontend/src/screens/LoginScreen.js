@@ -18,8 +18,8 @@ const LoginScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [login, {isLoading}] = useLoginMutation(); //from backend: to be able to make a post request to the backend
-  const userInfo = useSelector((state) => state.auth.userInfo) //from frontend //state.name.initialState 
+  const [login, {isLoading}] = useLoginMutation(); //from backend(apiSlice): to be able to make a post request to the backend
+  const userInfo = useSelector((state) => state.auth.userInfo) //from frontend(authSlice) //state.name.initialState 
 
   //redirect to /shipping or home page 
   const {search} = useLocation(); 
@@ -45,7 +45,8 @@ const LoginScreen = () => {
       dispatch(setCredentials({...res}));
 
       //navigate the value after "redirect"
-      navigate(redirect); 
+      navigate(redirect);
+       
     } catch (error) {
       toast.error(error?.data?.message || error?.error);
     }
