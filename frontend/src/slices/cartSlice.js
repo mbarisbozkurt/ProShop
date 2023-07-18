@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit";
 import { updateCart } from "../utils/cartUtils";
 
 //if there is an item before, get it; if not, ***initialize empty array
-const initialState = localStorage.getItem("cart") ? JSON.parse(localStorage.getItem("cart")) : {cartItems: []}; 
+const initialState = localStorage.getItem("cart") ? JSON.parse(localStorage.getItem("cart")) 
+: {cartItems: [], shippingAddress: {}, paymentMethod: ""}; 
 
 const cartSlice = createSlice({
   name: "cart", //to be able to cartItems with useSelector: state.cart.cartItems
@@ -24,10 +25,20 @@ const cartSlice = createSlice({
       const willbeRemovedItem = action.payload;
       state.cartItems = state.cartItems.filter((x) => x._id !== willbeRemovedItem._id);
       return updateCart(state); 
+    },
+
+    saveShippingAddress: (state, action) => {
+      state.shippingAddress = action.payload;
+      return updateCart(state);
+    },
+
+    savePaymentMethod: (state, action) => {
+      state.paymentMethod = action.payload;
+      return updateCart(state);
     }
   },
 });
 
-export const {addToCart, removeFromCart} = cartSlice.actions;
+export const {addToCart, removeFromCart, saveShippingAddress, savePaymentMethod} = cartSlice.actions;
 
 export default cartSlice.reducer;
