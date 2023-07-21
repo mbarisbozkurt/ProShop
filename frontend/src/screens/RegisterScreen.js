@@ -20,13 +20,12 @@ const RegisterScreen = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  const [register, {isLoading}] = useRegisterMutation(); //from backend(apiSlice): to be able to make a post request to the backend
-  const userInfo = useSelector((state) => state.auth.userInfo) //from frontend(authSlice) //state.name.initialState 
-
   //redirect to /shipping or home page 
   const {search} = useLocation(); 
   const sp = new URLSearchParams(search); 
   const redirect = sp.get("redirect") || "/"; //get whatever the value after "redirect" e.g: http://localhost:3000/login?redirect=/shipping
+
+  const userInfo = useSelector((state) => state.auth.userInfo) //from frontend(authSlice) //state.name.initialState 
 
   //whenever userInfo or redirect changed, if there is a user navigate him/her to /shipping or "/" (home page)
   useEffect(()=> {
@@ -35,6 +34,7 @@ const RegisterScreen = () => {
     }
   }, [userInfo, navigate, redirect])
 
+  const [register, {isLoading}] = useRegisterMutation(); //from backend(apiSlice): to be able to make a post request to the backend
 
   const submitHandler = async(event) => {
     event.preventDefault();

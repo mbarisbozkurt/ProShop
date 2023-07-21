@@ -4,8 +4,9 @@ import {Row, Col, Image, Form, ListGroup, Card, Button, ListGroupItem} from "rea
 import {FaTrash} from "react-icons/fa"
 import Message from '../components/Message';
 import { useDispatch, useSelector } from 'react-redux';
-import CardHeader from 'react-bootstrap/esm/CardHeader';
 import { addToCart, removeFromCart } from '../slices/cartSlice';
+
+//always checkout the redux in the browser
 
 const CartScreen = () => {
   const navigate = useNavigate();
@@ -75,12 +76,12 @@ const CartScreen = () => {
 
       <Col md={4}> {/*Remaining 4 out of 12*/} 
         <Card>
-          <CardHeader>
+          <Card.Header>
             <h3>
               {`Subtotal (${allItems.reduce((totalItem, item) => totalItem + item.qty, 0)}) Items`}
             </h3>
             ${`${allItems.reduce((totalCost, item) => totalCost + (item.qty * item.price), 0).toFixed(2)}`}
-          </CardHeader>
+          </Card.Header>
           
           <Card.Body>
             <Button type='button' className='btn btn-block' disabled={allItems.length === 0} onClick={checkoutHandler}>Proceed To Checkout</Button>

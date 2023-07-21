@@ -5,6 +5,7 @@ const port = process.env.PORT || 5000; //get the port from .env
 import connectDB from "./config/db.js";
 import productRoutes from "./routes/productRoutes.js"
 import userRoutes from "./routes/userRoutes.js"
+import orderRoutes from "./routes/orderRoutes.js"
 import {notFound, errorHandler} from "./middleware/errorMiddleware.js"
 import cookieParser from "cookie-parser";
 
@@ -24,7 +25,8 @@ app.get("/", (req, res) => {
 })
 
 app.use("/api/products", productRoutes); //after /api/products, no matter what is coming after that, go to productRoutes
-app.use("/api/users", userRoutes); //after /api/users, no matter what is coming after that, go to userRoutes  
+app.use("/api/users", userRoutes); 
+app.use("/api/orders", orderRoutes); 
 
 app.use(notFound);
 app.use(errorHandler);
