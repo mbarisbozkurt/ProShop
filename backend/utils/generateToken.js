@@ -5,7 +5,7 @@ const generateToken = (res, userId) => {
   const token = jwt.sign({userId}, process.env.JWT_SECRET, {expiresIn: "30d"});
 
   //set this token (jason web token) into http only cookie 
-  //jwt" is the name of the cookie, token is the token created 
+  //jwt is the name of the cookie, token is the token created 
   //httpOnly: It cannot be read by JavaScript, so the cookie can only be accessed via HTTP
   //secure: process.env.NODE_ENV !== "development" indicates that the cookie will be sent over HTTPS only 
   //but this setting is valid only when the application is not in development mode. This is important to avoid cookie hijacking.

@@ -3,8 +3,11 @@ import {Link, useParams} from "react-router-dom";
 import {Row, Col, ListGroup, Image, Button, Card, ListGroupItem} from "react-bootstrap";
 import Message from "../components/Message";
 import Loader from "../components/Loader";
-import { useGetOrderDetailsQuery } from "../slices/ordersApiSlice";
-import CardHeader from 'react-bootstrap/esm/CardHeader';
+import { useGetOrderDetailsQuery, usePayOrderMutation, useGetPayPalClientIdQuery } from "../slices/ordersApiSlice";
+import {PayPalButtons, usePayPalScriptReducer} from "@paypal/react-paypal-js"
+import {toast} from "react-toastify";
+import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
 
 const OrderScreen = () => {
 
@@ -14,6 +17,74 @@ const OrderScreen = () => {
   //get the data from the backend by using the orderId
   const{data: order, refetch, isLoading, error} = useGetOrderDetailsQuery(orderId);
   //console.log(order)
+
+  const [payOrder, {isLoading: loadingPay}] = usePayOrderMutation();
+  const {userInfo} = useSelector((state) => state.auth);
+
+  const [{isPending}, paypalDispatch] = usePayPalScriptReducer();
+  const {data: paypal, isLoading: loadingPayPal, error: errorPayPal} = useGetPayPalClientIdQuery();
+
+  //CHOOSE "PAY WITH DEBIT OR CREDIT CARD or CREATE AN ACCOUNT" option, enter the fields, click "continue as guests"
+  //THEN, CHECK COMPASS: isPaid should be true and paymentResult should be valid
+  //FOR CREDIT CARD PAYMENTS: CHOOSE THE USA AS COUNTRY SINCE TURKEY IS NOT VALID FOR PAYPAL
+  useEffect(() => {
+    if(!errorPayPal && !loadingPayPal && paypal.clientId){
+      const loadPayPalScript = async () => {
+        paypalDispatch({
+          type: "resetOptions",
+          value: {
+            "clientId": paypal.clientId,
+            currency: "USD",
+          }
+        });
+        paypalDispatch({type: "setLoadingStatus", value: "pending"});
+      }
+      if(order && !order.isPaid){
+        if(!window.paypal){
+          loadPayPalScript();
+        }
+      } 
+    }
+  }, [order, paypal, paypalDispatch, loadingPayPal, errorPayPal]);
+
+  //if does not work, only keep the onApproveTest which does not require paypal
+  function onApprove(data, actions) {
+    //trigger paypal
+    return actions.order.capture().then(async function(details){
+      try {
+        await payOrder({orderId, details});
+        refetch(); //UI da direkt "paid" yazması için
+        toast.success("Payment Successful!");
+      } catch (err) {
+        toast.error(err?.data?.message || err.message);
+      }
+    });
+  }
+
+  function onError(err) {
+    toast.error(err.message);
+  }
+
+  function createOrder(data, actions) {
+    return actions.order.create({
+      purchase_units: [
+        {
+          amount: {
+            value: order.totalPrice,
+          },
+        },
+      ],
+    }).then((orderId) => {
+      return orderId;
+    })
+  }
+
+  //check details part and the payment result in mongo
+  async function onApproveTest(){
+    await payOrder({orderId, details: {payer: {}}});
+    refetch(); //order infosunu güncellemek için, databasede isPaid artık true olduğundan browserda direkt "paid" yazması için
+    toast.success("Payment Successful!");
+  }
 
   return (
     isLoading ? <Loader/> : error ? <Message variant="danger"/> : 
@@ -100,7 +171,25 @@ const OrderScreen = () => {
                       <Col>${order.totalPrice}</Col>
                     </Row>
                   </ListGroupItem>
-                  {/*PAY ORDER*/}
+                  
+                  {!order.isPaid && (
+                    <ListGroupItem>
+                      {loadingPay && <Loader/>}
+                      {isPending && <Loader/>}
+                        <div>
+                          <Button onClick={onApproveTest} style={{marginBottom: "20px"}}>Complete Order </Button>
+                          <div>
+                            <PayPalButtons
+                              createOrder={createOrder}
+                              onApprove={onApprove}
+                              onError={onError}
+                            ></PayPalButtons>
+                            {/* <PayPalButtons onClick={onApproveTest} /> */}
+                          </div>
+                        </div>
+                    </ListGroupItem>
+                  )}
+
                   {/*MARK AS DELIVERED*/}
                 </ListGroup>
             </Card>
