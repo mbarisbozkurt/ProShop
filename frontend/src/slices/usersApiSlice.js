@@ -20,13 +20,22 @@ export const usersApiSlice = apiSlice.injectEndpoints({ //add endpoints to http:
       }),
     }),
 
-    logout: builder.mutation({  //called as: const [logoutBackendApiCall] = useLogoutMutation(); //from backend
+    logout: builder.mutation({  
       query: () => ({ 
         url: `${USERS_URL}/logout`, //make a post request to: http://localhost:5000/api/users/logout in the userController
         method: "POST",
       }),
     }),
+
+    
+    profile: builder.mutation({   
+      query: (data) => ({ 
+        url: `${USERS_URL}/profile`, //make a PUT request to: http://localhost:5000/api/users/profile in the userController
+        method: "PUT",
+        body: data, 
+      }),
+    }),
   }),
 });
 
-export const {useLoginMutation, useLogoutMutation, useRegisterMutation} = usersApiSlice; 
+export const {useLoginMutation, useLogoutMutation, useRegisterMutation, useProfileMutation} = usersApiSlice; 
