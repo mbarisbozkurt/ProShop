@@ -8,6 +8,7 @@ import {PayPalButtons, usePayPalScriptReducer} from "@paypal/react-paypal-js"
 import {toast} from "react-toastify";
 import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
+import { useDeliverOrderMutation } from '../slices/ordersApiSlice';
 
 const OrderScreen = () => {
 
@@ -80,10 +81,22 @@ const OrderScreen = () => {
   }
 
   //check details part and the payment result in mongo
-  async function onApproveTest(){
-    await payOrder({orderId, details: {payer: {}}});
-    refetch(); //order infosunu güncellemek için, databasede isPaid artık true olduğundan browserda direkt "paid" yazması için
-    toast.success("Payment Successful!");
+  // async function onApproveTest(){
+  //   await payOrder({orderId, details: {payer: {}}});
+  //   refetch(); //order infosunu güncellemek için, databasede isPaid artık true olduğundan browserda direkt "paid" yazması için
+  //   toast.success("Payment Successful!");
+  // }
+
+  const [deliveredOrder, {isLoading: loadingDeliver}] = useDeliverOrderMutation();
+
+  const adminDeliverHandler = async() => {
+    try {
+      await deliveredOrder(orderId).unwrap();
+      refetch();
+      toast.success("Order Delivered!");
+    } catch (error) {
+      toast.error(error?.data?.message || error?.message);
+    }
   }
 
   return (
@@ -172,12 +185,13 @@ const OrderScreen = () => {
                     </Row>
                   </ListGroupItem>
                   
-                  {!order.isPaid && (
+                  {/*PAY ORDER*/}
+                   {!order.isPaid && !userInfo.isAdmin && (
                     <ListGroupItem>
                       {loadingPay && <Loader/>}
                       {isPending && <Loader/>}
                         <div>
-                          <Button onClick={onApproveTest} style={{marginBottom: "20px"}}>Complete Order </Button>
+                          {/* <Button onClick={onApproveTest} style={{marginBottom: "20px"}}>Complete Order </Button> */}
                           <div>
                             <PayPalButtons
                               createOrder={createOrder}
@@ -190,7 +204,14 @@ const OrderScreen = () => {
                     </ListGroupItem>
                   )}
 
-                  {/*MARK AS DELIVERED*/}
+                   {/*MARK AS DELIVERED*/}
+                   {loadingDeliver && <Loader/>}
+                   {userInfo.isAdmin && order.isPaid && !order.isDelivered &&(
+                    <ListGroupItem>
+                      <Button type='button' onClick={adminDeliverHandler}>Mark As Delivered</Button>
+                    </ListGroupItem>     
+                   )}
+                  
                 </ListGroup>
             </Card>
           </Col>

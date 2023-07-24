@@ -93,7 +93,7 @@ const ProfileScreen = () => {
         <h2>My Orders</h2>
         {isLoading && <Loader/>}
         {error && <Message variant="danger">{error?.data?.message || error?.error}</Message>}
-        <Table striped hover responsive className='table-sm'>
+        <Table striped hover responsive>
           <thead>
             <tr>
               <th>ID</th>
@@ -106,7 +106,7 @@ const ProfileScreen = () => {
           </thead>
 
           <tbody>
-            {orders && orders.map((order) => (
+            {orders && orders.map((order) => ( /* "orders &&" is important, it doesnt work otherwise */
               <tr key={order._id}>
                 <td>{order._id}</td>
                 <td>{order.createdAt.substring(0,10)}</td>
@@ -114,7 +114,7 @@ const ProfileScreen = () => {
                 <td>{order.isPaid && order.paidAt.substring(0,10)} {!order.isPaid && <FaTimes style={{color: "red"}}/>} </td>
                 <td>{order.isDelivered && order.deliveredAt.substring(0,10)} {!order.isDelivered && <FaTimes style={{color: "red"}}/>}</td>
                 <td><LinkContainer to={`/order/${order._id}`}><Button variant="outline-primary">Details</Button></LinkContainer></td>
-            </tr>
+              </tr>
             ))}
           </tbody>
         </Table>
