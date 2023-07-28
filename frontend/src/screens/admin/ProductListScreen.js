@@ -1,5 +1,5 @@
 import React from 'react'
-import { useGetProductsQuery } from '../../slices/productsApiSlice';
+import { useDeleteProductMutation, useGetProductsQuery } from '../../slices/productsApiSlice';
 import {Row, Col, Table, Button} from "react-bootstrap";
 import { FaEdit } from 'react-icons/fa';
 import { FaTrash } from 'react-icons/fa';
@@ -7,22 +7,30 @@ import { FaPlus } from 'react-icons/fa';
 import Loader from '../../components/Loader';
 import Message from '../../components/Message';
 import { LinkContainer } from 'react-router-bootstrap';
-import { useCreateProductMutation } from '../../slices/productsApiSlice';
+import { useCreateProductMutation, } from '../../slices/productsApiSlice';
 import {toast} from "react-toastify";
 
 const ProductListScreen = () => {
 
   const {data: products, isLoading, error, refetch} = useGetProductsQuery();
   const [createProduct, {isLoading: loadingCreate}] = useCreateProductMutation();
+  const [deleteProduct, {isLoading: loadingDelete}] = useDeleteProductMutation();
   //console.log(products);
 
-  const deleteHandler = (id) => {
-    console.log("delete", id);
+  const deleteHandler = async(id) => {
+    if(window.confirm("Are you sure?")){
+      try {
+        const result = await deleteProduct(id).unwrap(); //unwrap backendden gelenleri işliyor (productController.js'deki deleteProduct fonksiyonundan gelen mesaj gibi)  
+        toast.success(result.message); //comes from backend
+        refetch(); //to update the products without refreshing the page
+      } catch (error) {
+        toast.error(error?.data?.message || error?.error);
+      }
+    }
   }
 
   const createProductHandler = async() => {
-
-    if(window.confirm("Are you sure, do you want to create a new product?")){
+    if(window.confirm("Are you sure?")){
       try {   
         await createProduct();
         refetch();
@@ -31,7 +39,6 @@ const ProductListScreen = () => {
         toast.error(error?.data?.message || error?.error);
       }
     }
-
   }
   
   return (    
@@ -46,6 +53,7 @@ const ProductListScreen = () => {
         </Col>
 
         {loadingCreate && <Loader/>}
+        {loadingDelete && <Loader/>}
         <Table striped hover responsive>
           <thead>
             <tr>

@@ -4,7 +4,7 @@ import {Form, Row, Col, FormGroup, FormLabel, FormControl, Button} from "react-b
 import { LinkContainer } from 'react-router-bootstrap';
 import FormContainer from '../../components/FormContainer';
 
-import { useUpdateProductMutation, useGetProductDetailsQuery} from '../../slices/productsApiSlice';
+import { useUpdateProductMutation, useGetProductDetailsQuery, useUploadProductImageMutation} from '../../slices/productsApiSlice';
 import Loader from '../../components/Loader';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -64,6 +64,23 @@ const ProductEditScreen = () => {
     }
    }
 
+   const [uploadProductImage, {isLoading: loadingUpload}] = useUploadProductImageMutation();
+
+   const uploadFileHandler = async(event) => {
+    //console.log(event.target.files[0]);
+    //send the image to backend and get the response
+    const formData = new FormData();
+    formData.append("image", event.target.files[0]);
+
+    try {
+      const res = await uploadProductImage(formData).unwrap();
+      toast.success(res.message);
+      setImage(res.image);
+    } catch (error) {
+      toast.error(error?.data?.message || error?.error);
+    } 
+   }
+
   return (
     <>
       <LinkContainer to={"/admin/productlist"}>
@@ -88,6 +105,13 @@ const ProductEditScreen = () => {
               </FormGroup>
 
               {/*IMAGE WILL COME HERE*/}
+              {/*Normal formgroup but 2 form control: 1 for type text: 1 for type file, and handle it in productApiSlice*/}
+              {loadingUpload && <Loader/>}
+              <FormGroup controlId='image' className='my-2'>
+                <FormLabel>Image</FormLabel>
+                <FormControl type="text" placeholder='Enter image url' value={image} onChange={(e) => setImage(e.target.value)} />
+                <FormControl type="file" label="Choose file" onChange={uploadFileHandler}/> {/*handle with that after slice*/}
+              </FormGroup>
 
               <FormGroup controlId='brand' className='my-2'>
                 <FormLabel>Brand</FormLabel>  

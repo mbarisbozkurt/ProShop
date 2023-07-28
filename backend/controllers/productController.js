@@ -23,7 +23,7 @@ const getProductById = asyncHandler(async(req, res) => {
   }
 })
 
-//@desc: Create a product
+//@desc: create a product
 //@route: POST /api/products
 //@access: private/admin
 
@@ -75,4 +75,22 @@ const updateProduct = asyncHandler(async(req, res) => {
   }
 })
 
-export {getProducts, getProductById, createProduct, updateProduct};
+
+//@desc: delete a product
+//@route: DELETE /api/products/:id
+//@access: Private/Admin
+const deleteProduct = asyncHandler(async(req, res) => {
+  //get the item 
+  const product = await Product.findById(req.params.id);
+
+  //delete the item
+  if(product){
+    res.status(200).json({message: "Item is deleted!"});
+    await Product.deleteOne({_id: product._id});
+  }else{
+    res.status(404);
+    throw new Error("Item could not be deleted");
+  }
+})
+
+export {getProducts, getProductById, createProduct, updateProduct, deleteProduct};
