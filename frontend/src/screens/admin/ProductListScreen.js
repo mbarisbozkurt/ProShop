@@ -7,17 +7,34 @@ import { FaPlus } from 'react-icons/fa';
 import Loader from '../../components/Loader';
 import Message from '../../components/Message';
 import { LinkContainer } from 'react-router-bootstrap';
+import { useCreateProductMutation } from '../../slices/productsApiSlice';
+import {toast} from "react-toastify";
 
 const ProductListScreen = () => {
 
-  const {data: products, isLoading, error} = useGetProductsQuery();
+  const {data: products, isLoading, error, refetch} = useGetProductsQuery();
+  const [createProduct, {isLoading: loadingCreate}] = useCreateProductMutation();
   //console.log(products);
 
   const deleteHandler = (id) => {
     console.log("delete", id);
   }
+
+  const createProductHandler = async() => {
+
+    if(window.confirm("Are you sure, do you want to create a new product?")){
+      try {   
+        await createProduct();
+        refetch();
+
+      } catch (error) {
+        toast.error(error?.data?.message || error?.error);
+      }
+    }
+
+  }
   
-  return (
+  return (    
     <>
       <Row className='align-items-center'>
         <Col>
@@ -25,9 +42,10 @@ const ProductListScreen = () => {
         </Col>
 
         <Col className='text-end'>
-          <Button type="button"> <FaPlus/> Create Product </Button>
+          <Button type="button" onClick={createProductHandler}> <FaPlus/> Create Product </Button>
         </Col>
 
+        {loadingCreate && <Loader/>}
         <Table striped hover responsive>
           <thead>
             <tr>

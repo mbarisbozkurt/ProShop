@@ -23,4 +23,56 @@ const getProductById = asyncHandler(async(req, res) => {
   }
 })
 
-export {getProducts, getProductById};
+//@desc: Create a product
+//@route: POST /api/products
+//@access: private/admin
+
+//CHECK and go to frontend
+const createProduct = asyncHandler(async(req, res) => {
+  const product = new Product({
+    user: req.user._id,
+    name: "Sample name",
+    image: "/images/sample.jpg",
+    brand: "Sample brand",
+    category: "Sample category",
+    description: "Sample description",
+    numReviews: 0,
+    price: 0,
+    countInStock: 0
+  })  
+
+  const createdProduct = await product.save();
+  res.status(201).json(createdProduct);
+})
+
+//@desc: update product
+//@route: PUT /api/products/:id
+//@access: private/admin  
+const updateProduct = asyncHandler(async(req, res) => {
+
+  //get the data that will come from frontend (form)
+  const {name, image, brand, category, description, price, countInStock} = req.body;
+
+  //find the product
+  const product = await Product.findById(req.params.id);
+
+  //update the product
+  if(product){  
+    product.name = name;
+    product.image = image;
+    product.brand = brand;
+    product.category = category;
+    product.description = description;
+    product.price = price;
+    product.countInStock = countInStock;
+
+    //save to database and respond to frontend
+    const updatedProuct = await product.save();
+    res.json(updatedProuct);
+  }else{
+    res.status(404);
+    throw new Error ("Resource not found");
+  }
+})
+
+export {getProducts, getProductById, createProduct, updateProduct};
