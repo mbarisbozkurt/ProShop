@@ -27,7 +27,7 @@ const ProductEditScreen = () => {
   const{data: product, isLoading, error} = useGetProductDetailsQuery(productId); //get the current product by using productId
   //console.log(product);
 
-  //hangi ürünü editlemek için tıkladığındabaşlangıçta onun bilgilerini göstermek için
+  //hangi ürünü editlemek için tıkladığında başlangıçta onun bilgilerini göstermek için
   useEffect(() => {
     if(product){
       setName(product.name);
@@ -104,7 +104,6 @@ const ProductEditScreen = () => {
                 <FormControl type='number' placeholder='Enter price' value={price} onChange={(e) => setPrice(e.target.value)}/>
               </FormGroup>
 
-              {/*IMAGE WILL COME HERE*/}
               {/*Normal formgroup but 2 form control: 1 for type text: 1 for type file, and handle it in productApiSlice*/}
               {loadingUpload && <Loader/>}
               <FormGroup controlId='image' className='my-2'>

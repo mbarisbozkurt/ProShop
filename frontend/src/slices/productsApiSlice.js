@@ -8,7 +8,7 @@ export const productsApiSlice = apiSlice.injectEndpoints({ //add endpoints to ht
       query: () => ({
         url: PRODUCTS_URL, //get data from here: http://localhost:5000/api/products
       }),
-      providesTags: ["Products"], //not the refresh the page
+      providesTags: ["Products"], //refresh the page
       keepUnusedDataFor: 5,
     }),
 

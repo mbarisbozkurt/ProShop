@@ -11,7 +11,6 @@ import uploadRoutes from "./routes/uploadRoutes.js"
 import {notFound, errorHandler} from "./middleware/errorMiddleware.js"
 import cookieParser from "cookie-parser"
 
-
 connectDB();
 
 const app = express();
