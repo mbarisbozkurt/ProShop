@@ -11,7 +11,7 @@ import { useCreateProductMutation, } from '../../slices/productsApiSlice';
 import {toast} from "react-toastify";
 
 const ProductListScreen = () => {
-
+  
   const {data: products, isLoading, error, refetch} = useGetProductsQuery();
   const [createProduct, {isLoading: loadingCreate}] = useCreateProductMutation();
   const [deleteProduct, {isLoading: loadingDelete}] = useDeleteProductMutation();

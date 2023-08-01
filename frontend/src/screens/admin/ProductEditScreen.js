@@ -24,7 +24,7 @@ const ProductEditScreen = () => {
 
   const {id: productId} = useParams(); //productId: id in the url
   //console.log(productId);
-  const{data: product, isLoading, error} = useGetProductDetailsQuery(productId); //get the current product by using productId
+  const{data: product, isLoading, error, refetch} = useGetProductDetailsQuery(productId); //get the current product by using productId
   //console.log(product);
 
   //hangi ürünü editlemek için tıkladığında başlangıçta onun bilgilerini göstermek için
@@ -57,6 +57,7 @@ const ProductEditScreen = () => {
         toast.error(result.error);
       }else{
         toast.success("Product updated!");
+        refetch();
         navigate("/admin/productlist");
       }
     } catch (error) {
