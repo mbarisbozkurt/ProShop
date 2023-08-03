@@ -2,9 +2,9 @@ main {
   min-height: 80vh;
 }
 
-.rating span {
+/* .rating span {
   margin: 0.1rem;
-}
+} */
 
 .rating svg {
   color: #f8e825;
@@ -34,7 +34,8 @@ table th {
 
 .review h2 {
   font-size: 24px;
-  background: #f4f4f4;
+  /* background: #f4f4f4; */
+  background: #EDE4FF;
   padding: 10px;
   border: 1px solid #ddd;
 }

@@ -26,11 +26,9 @@ const getProductById = asyncHandler(async(req, res) => {
 //@desc: create a product
 //@route: POST /api/products
 //@access: private/admin
-
-//CHECK and go to frontend
 const createProduct = asyncHandler(async(req, res) => {
   const product = new Product({
-    user: req.user._id,
+    user: req.user._id, //logged in user which is admin always
     name: "Sample name",
     image: "/images/sample.jpg",
     brand: "Sample brand",
@@ -89,8 +87,45 @@ const deleteProduct = asyncHandler(async(req, res) => {
     await Product.deleteOne({_id: product._id});
   }else{
     res.status(404);
-    throw new Error("Item could not be deleted");
+    throw new Error("Resource not found");
   }
 })
 
-export {getProducts, getProductById, createProduct, updateProduct, deleteProduct};
+//@desc: add a review to product
+//@route: POST /api/products/:id/reviews
+//@access: Private (only users should review)
+const createProductReview = asyncHandler(async (req, res) => {
+  const {rating, comment} = req.body;
+  const product = await Product.findById(req.params.id);
+  
+  if(product){
+    //find a review such that db.review == logged in user review stated in authMiddleware
+    const alreadyReviewed = product.reviews.find((review) => review.user.toString() === req.user._id.toString()); 
+
+    if(alreadyReviewed){
+      res.status(400); //Bad request, already reviewed
+      throw new Error ("Product already reviewed!");
+    }
+
+    const newReview = {
+      user: req.user._id, //user info comes from protect middleware (authMiddleware.js line15)
+      name: req.user.name, 
+      rating: Number(rating),
+      comment,
+    };
+
+    product.reviews.push(newReview);
+    product.numReviews = product.reviews.length;
+    product.rating = product.reviews.reduce((total, review) => review.rating + total, 0) / product.reviews.length;
+
+    await product.save();
+    res.status(201).json({message: 'Review added successfully'});
+
+  } else {
+    res.status(404);
+    throw new Error('Resource not found');
+  }
+});
+
+
+export {getProducts, getProductById, createProduct, updateProduct, deleteProduct, createProductReview};

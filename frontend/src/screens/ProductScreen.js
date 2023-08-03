@@ -5,27 +5,20 @@ import React from 'react'
 // import { useEffect, useState } from "react";
 // import axios from "axios";
 import { Link } from "react-router-dom";
-import {Row, Col, Image, ListGroup, Card, Button, ListGroupItem, Form} from "react-bootstrap"
+import {Row, Col, Image, ListGroup, Card,  Button, ListGroupItem, Form, FormGroup, FormLabel, FormControl} from "react-bootstrap"
 import Rating from "../components/Rating";
-import { useGetProductDetailsQuery } from "../slices/productsApiSlice";
+import { useGetProductDetailsQuery, useCreateReviewMutation } from "../slices/productsApiSlice";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import {addToCart} from "../slices/cartSlice"
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {toast} from "react-toastify";
+import CardHeader from "react-bootstrap/esm/CardHeader";
 
 const ProductScreen = () => {
-  // //get the product from the backend(server.js), particularly: app.get("/api/products/:id")
-  // const [product, setProduct] = useState({});
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState("");
 
-  // useEffect(() => {
-  //   const fetchProduct = async () => {
-  //     const {data} = await axios.get(`/api/products/${productId}`)
-  //     setProduct(data);
-  //   }
-  //   fetchProduct();
-  // },[productId]) //when productId changes, run this (after the column it specifies dependency)
-
-  // get the id from url when the image clicked in Product.js
   const {id: productId} = useParams(); //productId: id in the url
   const [qty, setQty] = useState(1);
 
@@ -37,7 +30,25 @@ const ProductScreen = () => {
     navigate("/cart");
   }
  
-  const{data: product, isLoading, error} = useGetProductDetailsQuery(productId); 
+  const{data: product, isLoading, error, refetch} = useGetProductDetailsQuery(productId); 
+  
+  const [createReview, {isLoading: createReviewLoading}] = useCreateReviewMutation();
+  const userInfo = useSelector((state)=> state.auth.userInfo);
+
+  const submitHandler = async(event) => {
+    event.preventDefault();
+    //console.log(rating); console.log(comment);
+    try {
+      const reviewInfo = {productId, rating, comment}; 
+      await createReview(reviewInfo).unwrap();
+      refetch();
+      toast.success("Review submitted");
+      setRating(0);
+      setComment("");
+    } catch (error) {
+      toast.error(error?.data?.message || error?.error);
+    }
+  }
 
   return (
     <>
@@ -47,6 +58,65 @@ const ProductScreen = () => {
           <Row>
             <Col md={5}>
               <Image src={product.image} alt={product.name} fluid/>
+              
+              <Row className="review">
+                <h2>Reviews</h2>
+                {product.numReviews === 0 && <Message variant={"danger"}>No Reviews</Message>}
+                  {product && product.reviews.map((review) => (
+                      <Col md={6}>
+                        <Card className="my-2">
+                          <CardHeader className="text-center"><h4>{review.name}</h4></CardHeader>
+                          <Card.Body className="text-center">
+                            <Rating rating={Number(review.rating)} />
+                            <h6>{review.createdAt.substring(0,10)}</h6>
+                            <h6>{review.comment}</h6>
+                          </Card.Body>
+                        </Card>
+                      </Col>
+                  ))}
+
+              <Row className="my-4">
+                <h2>Write a Customer Review</h2>
+                {createReviewLoading && <Loader/>}
+
+                {userInfo && 
+                  <Form onSubmit={submitHandler}>
+              
+                  <FormGroup controlId="rating" className="my-1">
+                    <FormLabel>Rating</FormLabel>
+                    <Form.Control as="select" value={rating} style={{backgroundColor: "#61677A", color: "#FFF"}} onChange={(e) => setRating(Number(e.target.value))}>
+                      <option value="">Choose...</option>
+                      <option value="1">1 - Poor</option>
+                      <option value="2">2 - Fair</option>
+                      <option value="3">3 - Good</option>
+                      <option value="4">4 - Very Good</option>
+                      <option value="5">5 - Excellent </option>
+                    </Form.Control>
+                  </FormGroup>
+                  
+                  <FormGroup controlId="comment" className="my-3">
+                      <FormLabel>Comment</FormLabel>
+                      <FormControl 
+                        as="textarea" 
+                        row="3"
+                        value={comment} 
+                        onChange={(e) => setComment(e.target.value)}
+                      /> 
+                  </FormGroup>
+
+                  <Button type="submit" disabled={createReviewLoading}>Submit</Button>
+                </Form>
+                }
+
+                {!userInfo && 
+                  <Message variant="danger">
+                    Please <Link to="/login">Sign In</Link> To Write A Review
+                  </Message>
+                }     
+              </Row>
+                
+              </Row>
+
             </Col>
 
             <Col md={4}>

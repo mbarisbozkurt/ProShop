@@ -50,8 +50,17 @@ export const productsApiSlice = apiSlice.injectEndpoints({ //add endpoints to ht
         method: "DELETE",
       }),
     }),
+
+    createReview: builder.mutation({ 
+      query: (data) => ({
+        url: `${PRODUCTS_URL}/${data.productId}/reviews`, // POST /api/products/:id/reviews
+        method: "POST",
+        body: data,
+      }),
+      invalidatesTags: ["Product"], //for fresh data
+    }),
   }),
 });
 
 export const {useGetProductsQuery, useGetProductDetailsQuery, useCreateProductMutation, 
-  useUpdateProductMutation, useUploadProductImageMutation, useDeleteProductMutation} = productsApiSlice; //Convention: use....Query in this case: use Products Query
+  useUpdateProductMutation, useUploadProductImageMutation, useDeleteProductMutation, useCreateReviewMutation} = productsApiSlice; //Convention: use....Query in this case: use Products Query

@@ -26,7 +26,7 @@ const addOrderItems = asyncHandler(async(req, res) => {
         _id: undefined, //let db creates the id
       })),
 
-      user: req.user._id, //req.user is coming from the browser, not from the frontend
+      user: req.user._id, //req.user is coming from the middleware, not from the frontend
 
       shippingAddress,
       paymentMethod,
