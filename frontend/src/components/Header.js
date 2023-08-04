@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import {useLogoutMutation} from '../slices/usersApiSlice'; //for backend
 import {logout} from '../slices/authSlice'; //for frontend
 import {useDispatch, useSelector} from "react-redux"; //for frontend
+import SearchBox from './SearchBox';
 
 const Header = () => {
 
@@ -48,7 +49,11 @@ const Header = () => {
             </LinkContainer>
             <Navbar.Toggle aria-controls='basic-navbar-nav'/>
             <Navbar.Collapse id='basic-navbar-nav'>
-               <Nav className='ms-auto'>
+               <Nav className='ms-auto' >
+                  
+                  {/*SearchBox will be rendered here*/}
+                  <SearchBox/>
+
                   <LinkContainer to="/cart">
                      <Nav.Link>
                         <FaShoppingCart/>Cart 

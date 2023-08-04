@@ -5,12 +5,22 @@ import Product from "../models/productModel.js";
 //@route: GET /api/products
 //@access: public  
 const getProducts = asyncHandler(async(req, res) => {
-  const pageSize = 4; //how many products user will see
+  const pageSize = 8; //how many products user will see
   const page = Number(req.query.pageNumber) || 1; //which page will user see
-  const count = await Product.countDocuments(); //number of products
 
-  const products = await Product.find({}).limit(pageSize).skip(pageSize * (page-1)); //show max pageSize products and skip previous pages, get current page products
+  const keyword = req.query.keyword 
+  ? {name: {$regex: req.query.keyword, $options: "i"}} //regular expression: e.g: if product name is iPhone but user entered "Phone" it is ok. $options: "i": case insensitive
+  : {};
+
+  //console.log({...keyword}); //check bash
+
+  const count = await Product.countDocuments({...keyword}); //number of products //{...keyword} spread whatever inside the keyword: name (product needs to be found) or {} (findAll)
+
+  const products = await Product.find({...keyword}).limit(pageSize).skip(pageSize * (page-1)); //show max pageSize products and skip previous pages, get current page products
   res.json({products, page, pages: Math.ceil(count/pageSize)}); //pages: number of pages in total
+  //console.log(products);
+  //console.log(page);
+  //console.log(Math.ceil(count/pageSize));
 })
 
 //@desc: fetch a product
