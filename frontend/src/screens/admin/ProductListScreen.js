@@ -9,13 +9,15 @@ import Message from '../../components/Message';
 import { LinkContainer } from 'react-router-bootstrap';
 import { useCreateProductMutation, } from '../../slices/productsApiSlice';
 import {toast} from "react-toastify";
+import { useParams } from 'react-router-dom';
+import Paginate from '../../components/Paginate';
 
 const ProductListScreen = () => {
-  
-  const {data: products, isLoading, error, refetch} = useGetProductsQuery();
+  const {pageNumber} = useParams();
+  //console.log(pageNumber);
+  const {data, isLoading, error, refetch} = useGetProductsQuery({pageNumber});
   const [createProduct, {isLoading: loadingCreate}] = useCreateProductMutation();
   const [deleteProduct, {isLoading: loadingDelete}] = useDeleteProductMutation();
-  //console.log(products);
 
   const deleteHandler = async(id) => {
     if(window.confirm("Are you sure?")){
@@ -69,7 +71,7 @@ const ProductListScreen = () => {
           <tbody>
             {isLoading && <Loader/>}
             {error && <Message variant="danger">{error?.data?.message || error?.error}</Message>}
-            {products && products.map((product) => (
+            {data && data.products && data.products.map((product) => (
               <tr key={product._id}>
                 <td>{product._id}</td>
                 <td>{product.name}</td>
@@ -87,6 +89,13 @@ const ProductListScreen = () => {
             ))}
           </tbody>
         </Table>
+        
+        <Row className="my-4" style={{ display: 'flex', justifyContent: 'center' }}>
+          <Col xs={12} md={1}>
+            {data && <Paginate pages={data.pages} page={data.page} isAdmin={true} />}
+          </Col>
+        </Row>
+
       </Row>
     </>
   )

@@ -22,11 +22,11 @@ const addOrderItems = asyncHandler(async(req, res) => {
     const order = new Order({
       orderItems: orderItems.map((item) => ({
         ...item,
-        product: item._id, //order modelda orderItems'daki product'ı belirle
+        product: item._id, //determine the product in orderItems
         _id: undefined, //let db creates the id
       })),
 
-      user: req.user._id, //req.user is coming from the middleware, not from the frontend
+      user: req.user._id, //req.user comes from the middleware, not from the frontend
 
       shippingAddress,
       paymentMethod,

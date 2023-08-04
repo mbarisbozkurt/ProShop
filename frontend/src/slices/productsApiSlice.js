@@ -5,12 +5,15 @@ import {apiSlice} from "./apiSlice"
 export const productsApiSlice = apiSlice.injectEndpoints({ //add endpoints to http://localhost:5000
   endpoints: (builder) => ({
     getProducts: builder.query({ //for useGetProductsQuery in the export part
-      query: () => ({
+      query: ({pageNumber}) => ({
         url: PRODUCTS_URL, //get data from here: http://localhost:5000/api/products
+        params: {
+          pageNumber,
+        },
       }),
       providesTags: ["Products"], //refresh the page
       keepUnusedDataFor: 5,
-    }),
+    }), 
 
     getProductDetails: builder.query({ 
       query: (productId) => ({
