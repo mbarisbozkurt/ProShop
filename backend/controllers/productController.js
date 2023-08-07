@@ -23,6 +23,32 @@ const getProducts = asyncHandler(async(req, res) => {
   //console.log(Math.ceil(count/pageSize));
 })
 
+//@desc: fetch products in ascending order
+//@route: GET /api/products/ascending 
+//@access: public  
+const getProductsAscending = asyncHandler(async(req, res) => {
+  const pageSize = 8; //how many products user will see
+  const page = Number(req.query.pageNumber) || 1; //which page will user see
+  const count = await Product.countDocuments();
+
+  const products = await Product.find({}).sort({price: 1}).limit(pageSize).skip(pageSize * (page-1)); //find all the products in the database and sort them in ascending order
+  res.json({products, page, pages: Math.ceil(count/pageSize)});
+  //console.log(products);
+})
+
+//@desc: fetch products in descending order
+//@route: GET /api/products/descending 
+//@access: public  
+const getProductsDescending = asyncHandler(async(req, res) => {
+  const pageSize = 8; //how many products user will see
+  const page = Number(req.query.pageNumber) || 1; //which page will user see
+  const count = await Product.countDocuments();
+
+  const products = await Product.find({}).sort({price: -1}).limit(pageSize).skip(pageSize * (page-1)); //find all the products in the database and sort them in ascending order
+  res.json({products, page, pages: Math.ceil(count/pageSize)});
+  //console.log(products);
+})
+
 //@desc: fetch a product
 //@route: GET /api/products/:id 
 //@access: public  
@@ -149,6 +175,4 @@ const getTopProducts = asyncHandler(async(req, res) => {
   res.status(200).json(products);
 })
 
-
-
-export {getProducts, getProductById, createProduct, updateProduct, deleteProduct, createProductReview, getTopProducts};
+export {getProducts, getProductById, createProduct, updateProduct, deleteProduct, createProductReview, getTopProducts, getProductsAscending, getProductsDescending};
