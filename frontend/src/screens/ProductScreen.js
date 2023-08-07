@@ -112,7 +112,7 @@ const ProductScreen = () => {
 
                 {!userInfo && 
                   <Message variant="danger">
-                    Please <Link to="/login">Sign In</Link> To Write A Review
+                    Please <Link to="/login">Sign In</Link> To Write a Review
                   </Message>
                 }     
               </Row>
