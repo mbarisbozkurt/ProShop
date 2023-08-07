@@ -8,6 +8,8 @@ import Message from '../components/Message'
 import { useParams } from 'react-router-dom'
 import Paginate from '../components/Paginate'
 import { LinkContainer } from 'react-router-bootstrap'
+import ProductCarousel from "../components/ProductCarousel"
+import Meta from '../components/Meta'
 
 const HomeScreen = () => {
 
@@ -22,11 +24,19 @@ const HomeScreen = () => {
    <> 
       {isLoading ? <Loader/> : error ? <Message variant="danger">{error?.data?.message || error.error}</Message> : (
          <>
-            {data.products.length !== 0 && //if there is a product that user searched for 
-               <>
-                  <LinkContainer to={"/"}>
-                     <Button className='btn btn-light'>Go Back</Button>
-                  </LinkContainer>
+            {data.products.length !== 0 && //if there is a product that user searched for and if there is a keyword that searched
+               <> 
+                  {keyword &&
+                     <LinkContainer to={"/"}>
+                        <Button className='btn btn-light'>Go Back</Button>
+                     </LinkContainer>
+                  }
+                  
+                  {!keyword &&
+                     <ProductCarousel/>
+                  }
+                  
+                  <Meta/>
                   <h1 className='my-3'>Latest Products</h1>
                   <Row>
                      {data.products.map((product) => (
@@ -52,7 +62,6 @@ const HomeScreen = () => {
                   </LinkContainer>
                </>
             }
-
          </>)}    
    </>
   )

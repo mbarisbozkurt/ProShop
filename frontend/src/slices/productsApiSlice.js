@@ -63,8 +63,16 @@ export const productsApiSlice = apiSlice.injectEndpoints({ //add endpoints to ht
       }),
       invalidatesTags: ["Product"], //for fresh data
     }),
+
+    getTopProducts: builder.query({ 
+      query: () => ({
+        url: `${PRODUCTS_URL}/top` //get data from here: http://localhost:5000/api/products/top
+      }),
+      keepUnusedDataFor: 5,
+    }),    
   }),
 });
 
-export const {useGetProductsQuery, useGetProductDetailsQuery, useCreateProductMutation, 
-  useUpdateProductMutation, useUploadProductImageMutation, useDeleteProductMutation, useCreateReviewMutation} = productsApiSlice; //Convention: use....Query in this case: use Products Query
+//Convention: use....Query e.g: use Products Query
+export const {useGetProductsQuery, useGetProductDetailsQuery, useCreateProductMutation, useUpdateProductMutation, 
+  useUploadProductImageMutation, useDeleteProductMutation, useCreateReviewMutation, useGetTopProductsQuery} = productsApiSlice; 

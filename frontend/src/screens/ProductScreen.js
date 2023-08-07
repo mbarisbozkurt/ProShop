@@ -14,6 +14,7 @@ import {addToCart} from "../slices/cartSlice"
 import { useDispatch, useSelector } from "react-redux";
 import {toast} from "react-toastify";
 import CardHeader from "react-bootstrap/esm/CardHeader";
+import Meta from "../components/Meta";
 
 const ProductScreen = () => {
   const [rating, setRating] = useState(0);
@@ -55,6 +56,7 @@ const ProductScreen = () => {
       <Link to="/" className="btn btn-light" style={{ marginBottom: "15px" }}>Go Back</Link>
       {isLoading ? <Loader/> : error ? <Message variant="danger">{error?.data?.message || error.error}</Message> : (
         <>
+          <Meta title={product.name}/>
           <Row>
             <Col md={5}>
               <Image src={product.image} alt={product.name} fluid/>
