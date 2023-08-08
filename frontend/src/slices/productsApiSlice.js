@@ -71,30 +71,9 @@ export const productsApiSlice = apiSlice.injectEndpoints({ //add endpoints to ht
       }),
       keepUnusedDataFor: 5,
     }),
-
-    getProductsAscending: builder.query({ 
-      query: ({pageNumber}) => ({
-        url: `${PRODUCTS_URL}/ascending`, //get data from here: http://localhost:5000/api/products/ascending
-        params: {
-          pageNumber,
-        },
-      }),
-      keepUnusedDataFor: 5,
-    }),
-
-    getProductsDescending: builder.query({ 
-      query: ({pageNumber}) => ({
-        url: `${PRODUCTS_URL}/descending`, //get data from here: http://localhost:5000/api/products/descending
-        params: {
-          pageNumber,
-        },
-      }),
-      keepUnusedDataFor: 5,
-    }),
-
   }),
 });
 
 //Convention: use....Query e.g: use Products Query
 export const {useGetProductsQuery, useGetProductDetailsQuery, useCreateProductMutation, useUpdateProductMutation, useUploadProductImageMutation, 
-  useDeleteProductMutation, useCreateReviewMutation, useGetTopProductsQuery, useGetProductsAscendingQuery, useGetProductsDescendingQuery} = productsApiSlice; 
+  useDeleteProductMutation, useCreateReviewMutation, useGetTopProductsQuery} = productsApiSlice; 
