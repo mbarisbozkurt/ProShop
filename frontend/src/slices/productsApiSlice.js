@@ -5,11 +5,12 @@ import {apiSlice} from "./apiSlice"
 export const productsApiSlice = apiSlice.injectEndpoints({ //add endpoints to http://localhost:5000
   endpoints: (builder) => ({
     getProducts: builder.query({ //for useGetProductsQuery in the export part
-      query: ({keyword, pageNumber}) => ({
+      query: ({keyword, pageNumber, sortOrder}) => ({
         url: PRODUCTS_URL, //get data from here: http://localhost:5000/api/products
         params: {
           keyword,
           pageNumber,
+          sortOrder,
         },
       }),
       providesTags: ["Products"], //refresh the page
@@ -83,7 +84,7 @@ export const productsApiSlice = apiSlice.injectEndpoints({ //add endpoints to ht
 
     getProductsDescending: builder.query({ 
       query: ({pageNumber}) => ({
-        url: `${PRODUCTS_URL}/descending`, //get data from here: http://localhost:5000/api/products/ascending
+        url: `${PRODUCTS_URL}/descending`, //get data from here: http://localhost:5000/api/products/descending
         params: {
           pageNumber,
         },

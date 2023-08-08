@@ -6,21 +6,32 @@ import Product from "../models/productModel.js";
 //@access: public  
 const getProducts = asyncHandler(async(req, res) => {
   const pageSize = 8; //how many products user will see
-  const page = Number(req.query.pageNumber) || 1; //which page will user see
 
+  //get from apiSlice
+  const sortOrder = req.query.sortOrder;
+  const page = Number(req.query.pageNumber) || 1; 
   const keyword = req.query.keyword 
   ? {name: {$regex: req.query.keyword, $options: "i"}} //regular expression: e.g: if product name is iPhone but user entered "Phone" it is ok. $options: "i": case insensitive
   : {};
-
-  //console.log({...keyword}); //check bash
+  //console.log(sortOrder, page, keyword);
 
   const count = await Product.countDocuments({...keyword}); //number of products //{...keyword} spread whatever inside the keyword: name (product needs to be found) or {} (findAll)
 
-  const products = await Product.find({...keyword}).limit(pageSize).skip(pageSize * (page-1)); //show max pageSize products and skip previous pages, get current page products
-  res.json({products, page, pages: Math.ceil(count/pageSize)}); //pages: number of pages in total
-  //console.log(products);
-  //console.log(page);
-  //console.log(Math.ceil(count/pageSize));
+  let sortCriteria = {}; 
+
+  if (sortOrder === "ascending") {
+    sortCriteria = {price: 1};
+  } else if (sortOrder === "descending") {
+    sortCriteria = {price: -1};
+  }
+
+  const products = await Product.find({...keyword}).limit(pageSize).skip(pageSize * (page-1)).sort(sortCriteria);
+  if (!products || products.length === 0) {
+      res.status(404);
+      throw new Error("Resource not found");
+  }else{
+    res.status(200).json({products, page, pages: Math.ceil(count/pageSize)});
+  }
 })
 
 //@desc: fetch products in ascending order
@@ -59,7 +70,7 @@ const getProductById = asyncHandler(async(req, res) => {
     return res.json(product);
   }else{
     res.status(404);
-    throw new Error("Resources not found") //it is processed by errorHandler in middleware
+    throw new Error("Resources not found"); //it is processed by errorHandler in middleware
   }
 })
 
