@@ -1,6 +1,6 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
-import {Form, Row, Col, FormGroup, FormLabel, FormControl, Button} from "react-bootstrap"
+import {Form, Row, FormGroup, FormLabel, FormControl, Button} from "react-bootstrap"
 import { LinkContainer } from 'react-router-bootstrap';
 import FormContainer from '../../components/FormContainer';
 
@@ -48,6 +48,7 @@ const ProductEditScreen = () => {
 
   //refresh the page if there is a problem with editing products  
   const submitHandler = async(event) => {
+    console.log("Hello");
     event.preventDefault();
     try {
       const updatedProduct = {productId, name, price, image, brand, countInStock, category, description}; //taken from the user with useState
@@ -91,10 +92,9 @@ const ProductEditScreen = () => {
       <FormContainer>
         <h1>Edit Product</h1>
         <Row>
-          <Col>
-            {isLoading && <Loader/>}
-            {error && <Message variant="danger">{error?.data?.message || error?.error}</Message>}
-            <Form onSubmit={submitHandler}>
+          {isLoading && <Loader/>}
+          {error && <Message variant="danger">{error?.data?.message || error?.error}</Message>}
+          <Form onSubmit={submitHandler}>
               <FormGroup controlId='name' className='my-2'>
                 <FormLabel>Name</FormLabel>
                 <FormControl type='text' placeholder='Enter name' value={name} onChange={(e) => setName(e.target.value)}/>
@@ -134,7 +134,6 @@ const ProductEditScreen = () => {
               </FormGroup>
               <Button type='submit' className='my-2'>Update</Button>
             </Form>
-          </Col>
         </Row>
       </FormContainer>
     </>

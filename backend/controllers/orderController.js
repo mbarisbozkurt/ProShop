@@ -163,7 +163,8 @@ const sendEmail = asyncHandler(async(req, res) => {
       to: `${orderDetails.user.email}`,
       subject: "Your Order Info",
       html: `
-      <h2>Hello, your order has been received successfully.</h2>
+      <h2>Hello, ${orderDetails.user.name}.</h2>
+      <p>Thank you for your order.</p>
       <h3>Order Details:</h3>
       <ul>
         ${generateOrderItemsHTML(orderDetails.orderItems)}
