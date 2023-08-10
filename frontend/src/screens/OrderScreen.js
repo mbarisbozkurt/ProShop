@@ -3,12 +3,11 @@ import {Link, useParams} from "react-router-dom";
 import {Row, Col, ListGroup, Image, Button, Card, ListGroupItem} from "react-bootstrap";
 import Message from "../components/Message";
 import Loader from "../components/Loader";
-import { useGetOrderDetailsQuery, usePayOrderMutation, useGetPayPalClientIdQuery } from "../slices/ordersApiSlice";
+import { useGetOrderDetailsQuery, usePayOrderMutation, useGetPayPalClientIdQuery, useDeliverOrderMutation, useSendEmailMutation } from "../slices/ordersApiSlice";
 import {PayPalButtons, usePayPalScriptReducer} from "@paypal/react-paypal-js"
 import {toast} from "react-toastify";
 import { useSelector } from 'react-redux';
 import { useEffect } from 'react';
-import { useDeliverOrderMutation } from '../slices/ordersApiSlice';
 
 const OrderScreen = () => {
 
@@ -20,14 +19,16 @@ const OrderScreen = () => {
   //console.log(order)
 
   const [payOrder, {isLoading: loadingPay}] = usePayOrderMutation();
+  const [sendEmail, {isLoading: loadingEmail}] = useSendEmailMutation();
   const {userInfo} = useSelector((state) => state.auth);
 
+  //paypal
   const [{isPending}, paypalDispatch] = usePayPalScriptReducer();
   const {data: paypal, isLoading: loadingPayPal, error: errorPayPal} = useGetPayPalClientIdQuery();
 
   //CHOOSE "PAY WITH DEBIT OR CREDIT CARD or CREATE AN ACCOUNT" option, enter the fields, click "continue as guests"
   //THEN, CHECK COMPASS: isPaid should be true and paymentResult should be valid
-  //FOR CREDIT CARD PAYMENTS: CHOOSE THE USA AS COUNTRY SINCE TURKEY IS NOT VALID FOR PAYPAL
+  //FOR CREDIT CARD PAYMENTS: CHOOSE THE USA AS A COUNTRY SINCE TURKEY IS NOT VALID FOR PAYPAL
   useEffect(() => {
     if(!errorPayPal && !loadingPayPal && paypal.clientId){
       const loadPayPalScript = async () => {
@@ -48,14 +49,15 @@ const OrderScreen = () => {
     }
   }, [order, paypal, paypalDispatch, loadingPayPal, errorPayPal]);
 
-  //if does not work, only keep the onApproveTest which does not require paypal
   function onApprove(data, actions) {
     //trigger paypal
     return actions.order.capture().then(async function(details){
       try {
         await payOrder({orderId, details});
+        await sendEmail(order);
         refetch(); //UI da direkt "paid" yazması için
         toast.success("Payment Successful!");
+
       } catch (err) {
         toast.error(err?.data?.message || err.message);
       }
@@ -79,14 +81,6 @@ const OrderScreen = () => {
       return orderId;
     })
   }
-
-  //check details part and the payment result in mongo
-  // async function onApproveTest(){
-  //   await payOrder({orderId, details: {payer: {}}});
-  //   refetch(); //order infosunu güncellemek için, databasede isPaid artık true olduğundan browserda direkt "paid" yazması için
-  //   toast.success("Payment Successful!");
-  // }
-
   const [deliveredOrder, {isLoading: loadingDeliver}] = useDeliverOrderMutation();
 
   const adminDeliverHandler = async() => {
@@ -103,7 +97,6 @@ const OrderScreen = () => {
     isLoading ? <Loader/> : error ? <Message variant="danger"/> : 
     (
       <>
-        {/*<p>asdasasd</p>*/}
         <h1>Order: {order._id}</h1>
         <Row>
           <Col md={8}>
@@ -190,6 +183,7 @@ const OrderScreen = () => {
                     <ListGroupItem>
                       {loadingPay && <Loader/>}
                       {isPending && <Loader/>}
+                      {loadingEmail && <Loader/>}
                         <div>
                           {/* <Button onClick={onApproveTest} style={{marginBottom: "20px"}}>Complete Order </Button> */}
                           <div>

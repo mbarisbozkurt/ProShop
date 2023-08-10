@@ -48,17 +48,25 @@ export const ordersApiSlice = apiSlice.injectEndpoints({ //add endpoints to http
       keepUnusedDataFor: 5
     }),
 
-    //PUT /api/orders/:id/deliver
     deliverOrder: builder.mutation({ 
       query: (orderId) => ({ 
         url: `${ORDERS_URL}/${orderId}/deliver`, //make a put request to: http://localhost:5000/api/orders/:id/deliver
         method: "PUT",
       }),
     }),
+
+    sendEmail: builder.mutation({ 
+      query: (order) => ({ 
+        url: `${ORDERS_URL}/sendEmail`, //make a post request to: http://localhost:5000/api/orders/sendEmail
+        method: "POST",
+        body: {...order},
+      }),
+    }),
+    
   }),
 });
 
 export const {useCreateOrderMutation, useGetOrderDetailsQuery, usePayOrderMutation, useGetPayPalClientIdQuery, 
-  useGetMyOrdersQuery, useGetOrdersQuery, useDeliverOrderMutation} = ordersApiSlice; 
+  useGetMyOrdersQuery, useGetOrdersQuery, useDeliverOrderMutation, useSendEmailMutation} = ordersApiSlice; 
 
 

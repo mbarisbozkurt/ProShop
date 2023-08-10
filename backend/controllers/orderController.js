@@ -1,5 +1,7 @@
 import asyncHandler from "../middleware/asyncHandler.js";
 import Order from "../models/orderModel.js";
+import Product from "../models/productModel.js";
+import nodemailer from "nodemailer";
 
 //@desc: Create new order
 //@route: POST /api/orders
@@ -91,20 +93,36 @@ const updateOrderToPaid = asyncHandler(async(req, res) => {
 //@desc: Update order to delivered
 //@route: PUT /api/orders/:id/deliver
 //@access: Private/Admin
-const updateOrderToDelivered = asyncHandler(async(req, res) => {
+const updateOrderToDelivered = asyncHandler(async (req, res) => {
   const order = await Order.findById(req.params.id);
 
-  if(order){
+  if(order) {
     order.isDelivered = true;
     order.deliveredAt = Date.now();
 
-    const updatedOrder = order.save();
+    //for all order in orderItems, update stock quantity 
+    for(let i = 0; i < order.orderItems.length; i++) {
+      const item = order.orderItems[i];
+      const product = await Product.findById(item.product); //Find the product from database
+
+      if(product) {
+        product.countInStock -= item.qty; 
+
+        if(product.countInStock < 0) { 
+          product.countInStock = 0;
+        }
+
+        await product.save(); 
+      }
+    }
+
+    const updatedOrder = await order.save();
     res.status(200).json(updatedOrder);
-  }else{
+  } else {
     res.status(404);
     throw new Error("Order not found");
   }
-})
+});
 
 //@desc: Get all orders
 //@route: GET /api/orders
@@ -114,4 +132,60 @@ const getOrders = asyncHandler(async(req, res) => {
   res.status(200).json(orders); //response
 })
 
-export{addOrderItems, getMyOrders, getOrderById, updateOrderToPaid, updateOrderToDelivered, getOrders};
+//@desc: Send order email
+//@route: POST /api/orders/sendEmail
+//@access: Private
+const sendEmail = asyncHandler(async(req, res) => {
+  const orderDetails = req.body;
+
+  const generateOrderItemsHTML = (items) => {
+    return items.map(item => `
+      <li>
+        <strong>Product Name:</strong> ${item.name} <br>
+        <strong>Quantity:</strong> ${item.qty} <br>
+        <strong>Price:</strong> $${item.price} 
+      </li>
+      <br>
+    `).join(''); 
+  }
+
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_PASS,
+      }
+    });
+
+    const message = {
+      from: process.env.GMAIL_USER,
+      to: `${orderDetails.user.email}`,
+      subject: "Your Order Info",
+      html: `
+      <h2>Hello, your order has been received successfully.</h2>
+      <h3>Order Details:</h3>
+      <ul>
+        ${generateOrderItemsHTML(orderDetails.orderItems)}
+      </ul>
+      <p><strong>Total Price:</strong> $${orderDetails.totalPrice}</p>
+      <p><strong>Payment Method:</strong> ${orderDetails.paymentMethod}</p>
+      <p><strong>Shipping Address:</strong> ${orderDetails.shippingAddress.address}, ${orderDetails.shippingAddress.city}, ${orderDetails.shippingAddress.postalCode}, ${orderDetails.shippingAddress.country}</p>
+       `
+    };
+
+    try {
+      const info = await transporter.sendMail(message);
+      console.log("Mail sent", info);
+    } catch (error) {
+      console.log(error, "error");
+    }
+    
+    res.status(201).json({msg: "Email sent successfully"});
+  } catch (error) {
+    res.status(500).json({error: error.message});
+  }
+
+});
+
+export{addOrderItems, getMyOrders, getOrderById, updateOrderToPaid, updateOrderToDelivered, getOrders, sendEmail};
